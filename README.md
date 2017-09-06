@@ -1,2 +1,2 @@
 # BlowoutTaskSubmitter
-Application to submit task into Blowout
+Application to submit tasks into Blowout
