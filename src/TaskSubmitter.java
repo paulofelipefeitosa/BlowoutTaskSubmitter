@@ -11,8 +11,8 @@ public class TaskSubmitter {
 
 	public TaskSubmitter(Properties properties) throws Exception {
 		this.blowout = new BlowoutController(properties);
-		
-		this.blowout.start(false);
+
+		this.blowout.start(true);
 	}
 
 	public void submitTask(Task task, int times) throws BlowoutException {
@@ -24,9 +24,12 @@ public class TaskSubmitter {
 		for (int i = 0; i < times; i++)
 			this.blowout.addTaskList(tasks);
 	}
-	
-	public void stop() throws Exception
-	{
+
+	public void stop() throws Exception {
 		this.blowout.stop();
+	}
+
+	public String getTaskState(String taskId) {
+		return this.blowout.getTaskState(taskId).getDesc();
 	}
 }
