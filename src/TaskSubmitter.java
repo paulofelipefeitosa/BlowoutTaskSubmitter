@@ -32,4 +32,9 @@ public class TaskSubmitter {
 	public String getTaskState(String taskId) {
 		return this.blowout.getTaskState(taskId).getDesc();
 	}
+	
+	public boolean isStopped()
+	{
+		return !this.blowout.isStarted();
+	}
 }

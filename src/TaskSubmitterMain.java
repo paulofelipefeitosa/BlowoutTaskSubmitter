@@ -1,10 +1,11 @@
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Properties;
-import java.util.Scanner;
 
 import org.fogbowcloud.blowout.core.model.Task;
 
@@ -23,28 +24,38 @@ public class TaskSubmitterMain {
 
 		taskSubmitter.submitTaskList(tasks, 1);
 
-		System.out.println(taskSubmitter.getTaskState(tasks.get(0).getId()));
+		Long startedTimestamp = System.currentTimeMillis();
+		
+		boolean allCompleted;
+		
+		do {
+			
+			Thread.sleep(10000);
+			
+			allCompleted = true;
 
-		Scanner sc = new Scanner(System.in);
+			for(Task task : tasks) {
 
-		Long ts1 = System.currentTimeMillis();
-		int cur = 0, last = 0;
-		while (!taskSubmitter.getTaskState(tasks.get(0).getId()).equals("Completed")) {
-			cur = (int) (System.currentTimeMillis() - ts1) / 1000;
-			if (cur > last) {
-				System.out.println(taskSubmitter.getTaskState(tasks.get(0).getId()));
-				// System.out.println((System.currentTimeMillis() - ts1)/1000);
-				last = cur + 10;
+				System.out.println(taskSubmitter.getTaskState(task.getId()));
+
+				if (!taskSubmitter.getTaskState(task.getId()).equals("Completed")) {
+					allCompleted = false;
+				}
+
 			}
-			if (sc.hasNext())
-				break;
+
+		} while (!allCompleted);
+
+		System.out.println("Execution time: " + (System.currentTimeMillis() - startedTimestamp)/1000);
+		
+		try {
+			taskSubmitter.stop();
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		} finally {
+			System.out.println("Has it stopped running? " + taskSubmitter.isStopped());
 		}
 
-		sc.close();
-
-		System.out.println("SAiu");
-
-		taskSubmitter.stop();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -57,5 +68,14 @@ public class TaskSubmitterMain {
 		ois.close();
 
 		return tasks;
+	}
+
+	private static void saveTaskList(List<Task> tasks, final String TASK_OBJECT)
+			throws FileNotFoundException, IOException {
+		ObjectOutputStream oss = new ObjectOutputStream(new FileOutputStream(TASK_OBJECT));
+
+		oss.writeObject(tasks);
+
+		oss.close();
 	}
 }
